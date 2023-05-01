@@ -1,3 +1,4 @@
+use crate::commands_enum;
 use crate::config::Config;
 use crate::{commands::indices, config::Cluster};
 use anyhow::{Context, Result};
@@ -22,21 +23,23 @@ pub struct ApplicationArguments {
     verbose: bool,
 }
 
-#[derive(Debug, Subcommand)]
-enum Commands {
-    /// Interact with indices
-    Indices(indices::Arguments),
-    /// Interact with aliases
-    Aliases,
-    /// Interact with nodes
-    Nodes,
-}
+// Generates the commands based on the modules in the commands directory
+// Specify the modules you want to include in the commands_enum! macro
+commands_enum!(indices);
+// #[derive(Debug, Subcommand)]
+// enum Commands {
+//     /// Interact with indices
+//     Indices(indices::Arguments),
+//     /// Interact with aliases
+//     Aliases,
+//     /// Interact with nodes
+//     Nodes,
+// }
 
 #[derive(Debug)]
 pub struct Application {
     config: Config,
     args: ApplicationArguments,
-    // client: Elasticsearch
 }
 
 impl Application {
@@ -46,11 +49,11 @@ impl Application {
     }
 
     pub async fn run(&self) -> Result<()> {
-        match &self.args.sub_command {
-            Commands::Indices(args) => indices::handle_command(args, self).await?,
-            Commands::Aliases => todo!(),
-            Commands::Nodes => todo!(),
-        }
+        Commands::run(self).await?;
+
+        // match &self.args.sub_command {
+        //     Commands::Indices(args) => indices::handle_command(args, self).await?,
+        // }
 
         Ok(())
     }

@@ -14,21 +14,16 @@ pub struct Arguments {
     sub_commands: Commands,
 }
 
-// commands_enum!(
-//     list,
-//     create,
-// );
-
 #[derive(Debug, Subcommand)]
 enum Commands {
     /// List all indices
-    List(indices_list::ListArgs),
+    List(indices_list::Arguments),
     /// Create an index
-    Create(indices_create::CreateArgs),
+    Create(indices_create::Arguments),
     /// Opens a closed index
-    Open(indices_open::OpenArgs),
+    Open(indices_open::Arguments),
     /// Closes an index
-    Close(indices_close::CloseArgs),
+    Close(indices_close::Arguments),
 }
 
 pub async fn handle_command(args: &Arguments, application: &Application) -> Result<()> {

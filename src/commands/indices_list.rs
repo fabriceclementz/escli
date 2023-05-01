@@ -34,7 +34,7 @@ fn display_option(o: &Option<String>) -> String {
 }
 
 #[derive(Parser, Debug)]
-pub struct ListArgs {
+pub struct Arguments {
     /// Output format
     #[arg(short, long, value_enum, default_value_t = Output::Default)]
     output: Output,
@@ -52,7 +52,7 @@ enum Output {
     Json,
 }
 
-pub async fn handle_command(args: &ListArgs, application: &Application) -> Result<()> {
+pub async fn handle_command(args: &Arguments, application: &Application) -> Result<()> {
     let client = application.get_http_client()?;
     let cat = client.cat();
     let response = cat

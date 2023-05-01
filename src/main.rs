@@ -8,11 +8,8 @@ mod commands;
 mod config;
 mod utils;
 
-// commands_enum!(
-//     indices,
-//     aliases,
-//     nodes,
-// );
+#[macro_use]
+mod macros;
 
 #[tokio::main]
 async fn main() -> Result<()> {

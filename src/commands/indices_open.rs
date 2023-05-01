@@ -8,7 +8,7 @@ use crate::application::Application;
 use crate::utils::output::{output_error_table, output_json, print_error, print_success};
 
 #[derive(Debug, Parser)]
-pub struct OpenArgs {
+pub struct Arguments {
     /// Name of the index to open
     name: String,
     /// Output format
@@ -27,7 +27,7 @@ enum Output {
     Json,
 }
 
-pub async fn handle_command(args: &OpenArgs, application: &Application) -> Result<()> {
+pub async fn handle_command(args: &Arguments, application: &Application) -> Result<()> {
     let client = application.get_http_client()?;
     let indices = client.indices();
 
