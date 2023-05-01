@@ -2,6 +2,16 @@
 name = "escli"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "A CLI for interacting with Elasticsearch (You Know, for Search)"
+readme = "README.md"
+homepage = "https://github.com/fabriceclementz/escli"
+repository = "https://github.com/fabriceclementz/escli"
+
+[[bin]]
+name = "escli"
+path = "src/main.rs"
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
