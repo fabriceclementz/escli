@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use colored::Colorize;
 use serde::Serialize;
+use tabled::{builder::Builder, settings::Style};
 
 pub fn output_json<T>(input: &T, pretty: bool) -> Result<()>
 where
@@ -13,6 +14,17 @@ where
 
     println!("{json}");
     Ok(())
+}
+
+pub fn output_error_table(reason: &str, status_code: &str) {
+    let mut builder = Builder::default();
+    builder
+        .set_header(["Reason", "Status Code"])
+        .push_record([reason, status_code]);
+
+    let mut table = builder.build();
+    table.with(Style::modern());
+    println!("{table}");
 }
 
 pub fn print_success(msg: String) {

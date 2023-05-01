@@ -7,7 +7,7 @@ use tabled::builder::Builder;
 use tabled::settings::Style;
 
 use crate::application::Application;
-use crate::utils::output::{output_json, print_error, print_success};
+use crate::utils::output::{output_error_table, output_json, print_error, print_success};
 
 #[derive(Debug, Parser)]
 pub struct OpenArgs {
@@ -47,15 +47,7 @@ pub async fn handle_command(args: &OpenArgs, application: &Application) -> Resul
         match args.output {
             Output::Default => {
                 print_error(format!("Index {} cannot be opened!", args.name.bold()));
-
-                let mut builder = Builder::default();
-                builder
-                    .set_header(["Reason", "Status Code"])
-                    .push_record([reason, &status_code]);
-
-                let mut table = builder.build();
-                table.with(Style::modern());
-                println!("{table}");
+                output_error_table(reason, &status_code);
             }
             Output::Json => output_json(ex.error(), args.pretty)?,
         };
