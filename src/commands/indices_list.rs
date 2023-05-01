@@ -2,9 +2,13 @@ use anyhow::{Context, Result};
 use clap::{Parser, ValueEnum};
 use elasticsearch::cat::CatIndicesParts;
 use serde::{Deserialize, Serialize};
-use tabled::{settings::Style, Table, Tabled};
+use tabled::{
+    settings::{Panel, Style},
+    Table, Tabled,
+};
 
 use crate::application::Application;
+use crate::utils::output::{output_json, JsonFormat};
 
 #[derive(Debug, Deserialize, Serialize, Tabled)]
 pub struct Index {
@@ -66,7 +70,7 @@ pub async fn handle_command(args: &ListArgs, application: &Application) -> Resul
         .pretty(true)
         .send()
         .await
-        .context("Cannot get response for indices list")?;
+        .context("Request error for getting indices list")?;
 
     let indices: Vec<Index> = response
         .json()
@@ -76,18 +80,14 @@ pub async fn handle_command(args: &ListArgs, application: &Application) -> Resul
     match args.output {
         Output::Default => {
             let mut table = Table::new(indices);
-            table.with(Style::modern());
+            table.with(Style::modern()).with(Panel::header("Indices"));
             println!("{}", table.to_string());
         }
         Output::Json => {
-            let json = match args.pretty {
-                true => serde_json::to_string_pretty(&indices)
-                    .context("Cannot serialize indices to pretty JSON")?,
-                false => {
-                    serde_json::to_string(&indices).context("Cannot serialize indices to JSON")?
-                }
+            match args.pretty {
+                true => output_json(&indices, JsonFormat::Pretty).context("serialize indices")?,
+                false => output_json(&indices, JsonFormat::Default).context("serialize indices")?,
             };
-            println!("{}", json);
         }
     };
 

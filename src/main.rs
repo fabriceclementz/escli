@@ -1,13 +1,12 @@
 use anyhow::Result;
 use application::{Application, ApplicationArguments};
-use clap::{Parser, Subcommand};
-use commands::*;
-use config::Config;
+use clap::Parser;
 use std::process;
 
 mod application;
 mod commands;
 mod config;
+mod utils;
 
 // commands_enum!(
 //     indices,
