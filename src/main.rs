@@ -1,34 +1,34 @@
 use anyhow::Result;
+use application::{Application, ApplicationArguments};
 use clap::{Parser, Subcommand};
+use commands::*;
+use config::Config;
+use std::process;
 
-#[derive(Parser)]
-#[clap(author, about, version, propagate_version = true)]
-struct Arguments {
-    #[command(subcommand)]
-    sub_command: Commands,
-}
+mod application;
+mod commands;
+mod config;
 
-#[derive(Subcommand)]
-enum Commands {
-    /// Interact with indices
-    Indices,
-    /// Interact with aliases
-    Aliases,
-    /// Interact with nodes
-    Nodes,
-}
+// commands_enum!(
+//     indices,
+//     aliases,
+//     nodes,
+// );
 
 #[tokio::main]
 async fn main() -> Result<()> {
     pretty_env_logger::init();
 
-    let args = Arguments::parse();
+    let args = ApplicationArguments::parse();
+    let application = Application::new(args)?;
 
-    match args.sub_command {
-        Commands::Indices => todo!(),
-        Commands::Aliases => todo!(),
-        Commands::Nodes => todo!(),
-    };
+    match application.run().await {
+        Ok(_) => {}
+        Err(err) => {
+            eprintln!("{:?}", err);
+            process::exit(1);
+        }
+    }
 
     Ok(())
 }
