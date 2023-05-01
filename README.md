@@ -22,7 +22,27 @@ TODO
 
 ## Usage
 
+### Aliases
+
+- [ ] Add
+- [ ] Remove
+- [ ] Update
+
+### Mappings
+
+- [ ] Get
+
 ### Indices
+
+- [x] List
+- [x] Create
+- [x] Open
+- [x] Close
+- [ ] Delete
+- [ ] Refresh
+- [ ] Force merge
+- [ ] Flush
+- [ ] Reindex
 
 **List indices**
 
