@@ -41,6 +41,63 @@ Options:
   -V, --version          Print version
 ```
 
+**Create index**
+
+```sh
+Create an index
+
+Usage: escli indices create [OPTIONS] <NAME>
+
+Arguments:
+  <NAME>  Name of the index to create
+
+Options:
+  -o, --output <OUTPUT>  Output format [default: default] [possible values: default, json]
+  -p, --pretty           Pretty print JSON output
+  -c, --config <CONFIG>  Config file (default is $HOME/.escli.yaml)
+  -v, --verbose          Make the operation more talkative
+  -h, --help             Print help (see more with '--help')
+  -V, --version          Print version
+```
+
+**Open index**
+
+```sh
+Opens a closed index
+
+Usage: escli indices open [OPTIONS] <NAME>
+
+Arguments:
+  <NAME>  Name of the index to open
+
+Options:
+  -o, --output <OUTPUT>  Output format [default: default] [possible values: default, json]
+  -p, --pretty           Pretty print JSON output
+  -c, --config <CONFIG>  Config file (default is $HOME/.escli.yaml)
+  -v, --verbose          Make the operation more talkative
+  -h, --help             Print help (see more with '--help')
+  -V, --version          Print version
+```
+
+**Close index**
+
+```sh
+Closes an index
+
+Usage: escli indices close [OPTIONS] <NAME>
+
+Arguments:
+  <NAME>  Name of the index to close
+
+Options:
+  -o, --output <OUTPUT>  Output format [default: default] [possible values: default, json]
+  -p, --pretty           Pretty print JSON output
+  -c, --config <CONFIG>  Config file (default is $HOME/.escli.yaml)
+  -v, --verbose          Make the operation more talkative
+  -h, --help             Print help (see more with '--help')
+  -V, --version          Print version
+```
+
 ## Built With
 
 - [Rust](https://www.rust-lang.org)

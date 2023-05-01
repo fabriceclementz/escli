@@ -3,8 +3,6 @@ use clap::{Parser, ValueEnum};
 use colored::Colorize;
 use elasticsearch::indices::IndicesOpenParts;
 use serde_json::Value;
-use tabled::builder::Builder;
-use tabled::settings::Style;
 
 use crate::application::Application;
 use crate::utils::output::{output_error_table, output_json, print_error, print_success};

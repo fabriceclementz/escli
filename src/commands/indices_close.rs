@@ -3,15 +3,13 @@ use clap::{Parser, ValueEnum};
 use colored::Colorize;
 use elasticsearch::indices::IndicesCloseParts;
 use serde_json::Value;
-use tabled::builder::Builder;
-use tabled::settings::Style;
 
 use crate::application::Application;
 use crate::utils::output::{output_error_table, output_json, print_error, print_success};
 
 #[derive(Debug, Parser)]
 pub struct CloseArgs {
-    /// Name of the index to open
+    /// Name of the index to close
     name: String,
     /// Output format
     #[arg(short, long, value_enum, default_value_t = Output::Default)]
