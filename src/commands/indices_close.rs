@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use clap::{Parser, ValueEnum};
 use colored::Colorize;
-use elasticsearch::indices::IndicesCreateParts;
+use elasticsearch::indices::IndicesCloseParts;
 use serde_json::Value;
 use tabled::builder::Builder;
 use tabled::settings::Style;
@@ -10,13 +10,12 @@ use crate::application::Application;
 use crate::utils::output::{output_json, print_error, print_success};
 
 #[derive(Debug, Parser)]
-pub struct CreateArgs {
-    /// Name of the index to create
+pub struct CloseArgs {
+    /// Name of the index to open
     name: String,
     /// Output format
     #[arg(short, long, value_enum, default_value_t = Output::Default)]
     output: Output,
-
     /// Pretty print JSON output
     #[arg(short, long, default_value_t = false)]
     pretty: bool,
@@ -30,15 +29,15 @@ enum Output {
     Json,
 }
 
-pub async fn handle_command(args: &CreateArgs, application: &Application) -> Result<()> {
+pub async fn handle_command(args: &CloseArgs, application: &Application) -> Result<()> {
     let client = application.get_http_client()?;
     let indices = client.indices();
-    let create = indices.create(IndicesCreateParts::Index(&args.name));
 
-    let response = create
+    let response = indices
+        .close(IndicesCloseParts::Index(&[&args.name]))
         .send()
         .await
-        .context(format!("Request error for creating index {}", &args.name))?;
+        .context(format!("Request error for closing index {}", &args.name))?;
 
     if !response.status_code().is_success() {
         let ex = response.exception().await?.unwrap();
@@ -47,7 +46,7 @@ pub async fn handle_command(args: &CreateArgs, application: &Application) -> Res
 
         match args.output {
             Output::Default => {
-                print_error(format!("Index {} cannot be created!", args.name.bold()));
+                print_error(format!("Index {} cannot be closed!", args.name.bold()));
 
                 let mut builder = Builder::default();
                 builder
@@ -59,11 +58,11 @@ pub async fn handle_command(args: &CreateArgs, application: &Application) -> Res
                 println!("{table}");
             }
             Output::Json => output_json(ex.error(), args.pretty)?,
-        }
+        };
     } else {
         match args.output {
             Output::Default => {
-                print_success(format!("Index {} created successfully!", args.name.bold()))
+                print_success(format!("Index {} closed successfully!", args.name.bold()))
             }
             Output::Json => {
                 let response_body: Value = response.json().await?;

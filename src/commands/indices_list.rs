@@ -8,7 +8,7 @@ use tabled::{
 };
 
 use crate::application::Application;
-use crate::utils::output::{output_json, JsonFormat};
+use crate::utils::output::output_json;
 
 #[derive(Debug, Deserialize, Serialize, Tabled)]
 pub struct Index {
@@ -81,14 +81,9 @@ pub async fn handle_command(args: &ListArgs, application: &Application) -> Resul
         Output::Default => {
             let mut table = Table::new(indices);
             table.with(Style::modern()).with(Panel::header("Indices"));
-            println!("{}", table.to_string());
+            println!("{table}");
         }
-        Output::Json => {
-            match args.pretty {
-                true => output_json(&indices, JsonFormat::Pretty).context("serialize indices")?,
-                false => output_json(&indices, JsonFormat::Default).context("serialize indices")?,
-            };
-        }
+        Output::Json => output_json(&indices, args.pretty)?,
     };
 
     Ok(())
