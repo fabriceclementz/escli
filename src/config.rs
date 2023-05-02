@@ -1,7 +1,12 @@
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
 use log::debug;
 use serde::Deserialize;
-use std::{collections::HashMap, fmt::Display};
+use std::{
+    collections::HashMap,
+    fmt::Display,
+    fs::File,
+    path::{Path, PathBuf},
+};
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -9,21 +14,20 @@ pub struct Config {
 }
 
 impl Config {
+    /// Loads config file from path or $HOME/.config/escli.yaml
     pub fn load(path: Option<&String>) -> Result<Self> {
-        debug!("Loading application config");
+        if let Some(path) = path {
+            debug!("Loading application config from {}", path);
+            let config = read_config_file(&Path::new(path).to_path_buf())?;
+            return Ok(config);
+        }
 
-        // TODO: load config file from path or $HOME/.config/escli.yaml
-        let mut clusters = HashMap::new();
-        clusters.insert(
-            "local".into(),
-            Cluster {
-                host: "127.0.0.1".into(),
-                port: Some(9200),
-                protocol: Some(Protocol::Http),
-            },
-        );
+        debug!("Loading application config from ~/.escli/config.yaml");
+        let home_dir = dirs::home_dir().context("Unable to get home directory")?;
+        let config_path = home_dir.join(Path::new(".escli/config.yaml"));
 
-        Ok(Self { clusters })
+        let config = read_config_file(&config_path)?;
+        Ok(config)
     }
 
     pub fn get_cluster_by_name(&self, name: &str) -> Result<&Cluster> {
@@ -74,4 +78,14 @@ impl Display for Protocol {
             Protocol::Https => f.write_str("https"),
         }
     }
+}
+
+fn read_config_file(path: &PathBuf) -> Result<Config> {
+    let config_file =
+        File::open(&path).context(format!("Unable to open config file at {:?}", path))?;
+
+    let config: Config = serde_yaml::from_reader(config_file)
+        .context(format!("Unable to deserialize config file at {:?}", path))?;
+
+    Ok(config)
 }

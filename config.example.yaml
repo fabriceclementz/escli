@@ -1,0 +1,13 @@
+clusters:
+  local:
+    host: 127.0.0.1
+    port: 9200
+    protocol: http
+  staging:
+    host: staging.es
+    port: 9200
+    protocol: https
+  production:
+    host: production.es
+    port: 9200
+    protocol: https

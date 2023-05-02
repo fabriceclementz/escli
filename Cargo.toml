@@ -19,6 +19,7 @@ path = "src/main.rs"
 anyhow = "1.0.71"
 clap = { version = "4.2.5", features = ["derive"] }
 colored = "2.0.0"
+dirs = "5.0.1"
 elasticsearch = "8.5.0-alpha.1"
 log = "0.4.17"
 paste = "1.0.12"

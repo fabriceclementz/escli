@@ -22,6 +22,32 @@ TODO
 
 ## Usage
 
+### Configuration
+
+escli uses a configuration file that contains the connection parameters for each of the clusters you want to connect on. The format is as follows:
+
+```yaml
+clusters:
+  local:
+    host: 127.0.0.1
+    port: 9200
+    protocol: http
+  staging:
+    host: staging.es
+    port: 9200
+    protocol: https
+  production:
+    host: production.es
+    port: 9200
+    protocol: https
+```
+
+By default, the CLI will try to load a config file at `~/.escli/config.yaml` but you can provide another path via the `--config` flag as follows:
+
+```sh
+escli -c ./my-config.yaml
+```
+
 ### Aliases
 
 - [x] List
