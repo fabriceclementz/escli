@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use clap::{Parser, ValueEnum};
+use clap::Parser;
 use elasticsearch::cat::CatIndicesParts;
 use serde::{Deserialize, Serialize};
 use tabled::{
@@ -8,7 +8,7 @@ use tabled::{
 };
 
 use crate::application::Application;
-use crate::utils::output::output_json;
+use crate::utils::output::{output_json, Output};
 
 #[derive(Debug, Deserialize, Serialize, Tabled)]
 pub struct Index {
@@ -42,14 +42,6 @@ pub struct Arguments {
     /// Pretty print JSON output
     #[arg(short, long, default_value_t = false)]
     pretty: bool,
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum Output {
-    /// Display indices in table format
-    Default,
-    /// Displays output as JSON
-    Json,
 }
 
 pub async fn handle_command(args: &Arguments, application: &Application) -> Result<()> {

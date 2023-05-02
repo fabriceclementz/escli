@@ -24,6 +24,7 @@ TODO
 
 ### Aliases
 
+- [x] List
 - [ ] Add
 - [ ] Remove
 - [ ] Update
@@ -38,7 +39,7 @@ TODO
 - [x] Create
 - [x] Open
 - [x] Close
-- [ ] Delete
+- [x] Delete
 - [ ] Refresh
 - [ ] Force merge
 - [ ] Flush

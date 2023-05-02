@@ -1,7 +1,16 @@
 use anyhow::{Context, Result};
+use clap::ValueEnum;
 use colored::Colorize;
 use serde::Serialize;
 use tabled::{builder::Builder, settings::Style};
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+pub enum Output {
+    /// Display in human friendly format
+    Default,
+    /// Displays output as JSON
+    Json,
+}
 
 pub fn output_json<T>(input: &T, pretty: bool) -> Result<()>
 where

@@ -1,6 +1,7 @@
+use crate::commands::{aliases, indices};
 use crate::commands_enum;
+use crate::config::Cluster;
 use crate::config::Config;
-use crate::{commands::indices, config::Cluster};
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use elasticsearch::{http::transport::Transport, Elasticsearch};
@@ -25,16 +26,7 @@ pub struct ApplicationArguments {
 
 // Generates the commands based on the modules in the commands directory
 // Specify the modules you want to include in the commands_enum! macro
-commands_enum!(indices);
-// #[derive(Debug, Subcommand)]
-// enum Commands {
-//     /// Interact with indices
-//     Indices(indices::Arguments),
-//     /// Interact with aliases
-//     Aliases,
-//     /// Interact with nodes
-//     Nodes,
-// }
+commands_enum!(indices, aliases);
 
 #[derive(Debug)]
 pub struct Application {

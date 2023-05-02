@@ -1,11 +1,11 @@
 use anyhow::{Context, Result};
-use clap::{Parser, ValueEnum};
+use clap::Parser;
 use colored::Colorize;
 use elasticsearch::indices::IndicesCreateParts;
-use serde_json::Value;
 
 use crate::application::Application;
-use crate::utils::output::{output_error_table, output_json, print_error, print_success};
+use crate::utils::handle_response::handle_response;
+use crate::utils::output::Output;
 
 #[derive(Debug, Parser)]
 pub struct Arguments {
@@ -20,47 +20,25 @@ pub struct Arguments {
     pretty: bool,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum Output {
-    /// Display indices in table format
-    Default,
-    /// Displays output as JSON
-    Json,
-}
-
 pub async fn handle_command(args: &Arguments, application: &Application) -> Result<()> {
+    let index_name = &args.name;
     let client = application.get_http_client()?;
     let indices = client.indices();
-    let create = indices.create(IndicesCreateParts::Index(&args.name));
+    let create = indices.create(IndicesCreateParts::Index(index_name));
 
     let response = create
         .send()
         .await
-        .context(format!("Request error for creating index {}", &args.name))?;
+        .context(format!("Request error for creating index {}", index_name))?;
 
-    if !response.status_code().is_success() {
-        let ex = response.exception().await?.unwrap();
-        let reason = ex.error().reason().unwrap_or("");
-        let status_code = ex.status().unwrap_or(0).to_string();
-
-        match args.output {
-            Output::Default => {
-                print_error(format!("Index {} cannot be created!", args.name.bold()));
-                output_error_table(reason, &status_code);
-            }
-            Output::Json => output_json(ex.error(), args.pretty)?,
-        }
-    } else {
-        match args.output {
-            Output::Default => {
-                print_success(format!("Index {} created successfully!", args.name.bold()))
-            }
-            Output::Json => {
-                let response_body: Value = response.json().await?;
-                output_json(&response_body, args.pretty)?
-            }
-        }
-    }
+    handle_response(
+        &args.output,
+        response,
+        format!("Index {} created successfully!", index_name.bold()),
+        format!("Index {} cannot be created!", index_name.bold()),
+        args.pretty,
+    )
+    .await?;
 
     Ok(())
 }
