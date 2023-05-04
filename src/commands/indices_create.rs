@@ -15,6 +15,9 @@ use crate::utils::output::Output;
 pub struct Arguments {
     /// Name of the index to create
     name: String,
+    /// Path to a settings definition file in JSON format
+    #[arg(short, long)]
+    settings: Option<String>,
     /// Path to a mapping definition in JSON format
     #[arg(short, long)]
     mapping: Option<String>,
@@ -43,6 +46,18 @@ pub async fn handle_command(args: &Arguments, application: &Application) -> Resu
             serde_json::from_reader(file).context("Malformated mapping definition")?;
 
         body["mappings"] = mapping;
+    }
+
+    if let Some(settings_path) = &args.settings {
+        let file = File::open(Path::new(&settings_path)).context(format!(
+            "Cannot open settings definition file at {}",
+            settings_path
+        ))?;
+
+        let settings: serde_json::Value =
+            serde_json::from_reader(file).context("Malformated settings definition")?;
+
+        body["settings"] = json!({ "index": settings });
     }
 
     let response = create
