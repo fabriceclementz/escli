@@ -58,6 +58,12 @@ escli -c ./my-config.yaml
 ### Mappings
 
 - [x] Get
+- [ ] Update
+
+## Index settings
+
+- [ ] Get
+- [ ] Update
 
 ### Indices
 
@@ -69,7 +75,7 @@ escli -c ./my-config.yaml
 - [ ] Refresh
 - [ ] Force merge
 - [ ] Flush
-- [ ] Reindex
+- [x] Reindex
 
 **List indices**
 
