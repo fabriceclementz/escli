@@ -1,6 +1,7 @@
 pub mod aliases;
 pub mod indices;
 pub mod mappings;
+pub mod reindex;
 pub use colored::Colorize;
 
 mod aliases_list;

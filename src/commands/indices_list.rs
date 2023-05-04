@@ -5,7 +5,6 @@ use elasticsearch::cat::CatIndicesParts;
 use elasticsearch::indices::IndicesGetSettingsParts;
 use elasticsearch::Elasticsearch;
 use futures::{stream, StreamExt};
-use log::debug;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tabled::settings::object::Rows;

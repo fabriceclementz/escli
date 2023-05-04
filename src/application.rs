@@ -1,4 +1,4 @@
-use crate::commands::{aliases, indices, mappings};
+use crate::commands::{aliases, indices, mappings, reindex};
 use crate::commands_enum;
 use crate::config::Cluster;
 use crate::config::Config;
@@ -26,7 +26,7 @@ pub struct ApplicationArguments {
 
 // Generates the commands based on the modules in the commands directory
 // Specify the modules you want to include in the commands_enum! macro
-commands_enum!(indices, aliases, mappings);
+commands_enum!(indices, aliases, mappings, reindex);
 
 #[derive(Debug)]
 pub struct Application {
