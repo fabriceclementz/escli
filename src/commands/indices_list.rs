@@ -1,11 +1,15 @@
 use anyhow::{Context, Result};
 use clap::Parser;
+use colored::Colorize;
 use elasticsearch::cat::CatIndicesParts;
 use elasticsearch::indices::IndicesGetSettingsParts;
 use elasticsearch::Elasticsearch;
+use futures::{stream, StreamExt};
+use log::debug;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tabled::settings::{Panel, Style};
+use tabled::settings::object::Rows;
+use tabled::settings::{Format, Modify, Panel, Style};
 use tabled::{Table, Tabled};
 
 use crate::application::Application;
@@ -14,6 +18,7 @@ use crate::utils::output::{output_json, Output};
 #[derive(Debug, Deserialize, Serialize, Tabled)]
 pub struct Index {
     #[serde(rename = "index")]
+    #[tabled(display_with("Self::display_name_colorized", self))]
     name: String,
     health: String,
     status: String,
@@ -29,13 +34,25 @@ pub struct Index {
     version: Option<String>,
 }
 
+impl Index {
+    fn display_name_colorized(&self) -> String {
+        let name = &self.name;
+        match self.health.as_str() {
+            "yellow" => name.yellow().bold(),
+            "green" => name.green().bold(),
+            "red" => name.red().bold(),
+            _ => name.bold(),
+        }
+        .to_string()
+    }
+}
+
 fn display_option(o: &Option<String>) -> String {
     match o {
         Some(s) => s.to_owned(),
         None => "".into(),
     }
 }
-
 #[derive(Parser, Debug)]
 pub struct Arguments {
     /// Output format
@@ -67,21 +84,27 @@ pub async fn handle_command(args: &Arguments, application: &Application) -> Resu
         .await
         .context("Request error for getting indices list")?;
 
-    let mut indices: Vec<Index> = response
+    let indices: Vec<Index> = response
         .json()
         .await
         .context("Cannot parse JSON response for indices list")?;
 
-    //  TODO: improve with StreamExt
-    for index in &mut indices {
-        let index_version = get_index_version(&client, index).await?;
-        index.version = Some(index_version.to_string());
-    }
+    let indices: Vec<Index> = stream::iter(indices)
+        .map(|index| add_version_to_index(index, client.clone()))
+        .buffer_unordered(50)
+        .collect()
+        .await;
 
     match args.output {
         Output::Default => {
+            let header_format = Format::content(|s| s.bold().to_string());
+
             let mut table = Table::new(indices);
-            table.with(Style::modern()).with(Panel::header("Indices"));
+            table
+                .with(Style::modern())
+                .with(Panel::header("Indices".bold().to_string()))
+                .with(Modify::new(Rows::single(1)).with(header_format));
+
             println!("{table}");
         }
         Output::Json => output_json(&indices, args.pretty)?,
@@ -90,7 +113,13 @@ pub async fn handle_command(args: &Arguments, application: &Application) -> Resu
     Ok(())
 }
 
-async fn get_index_version(client: &Elasticsearch, index: &Index) -> Result<String> {
+async fn add_version_to_index(mut index: Index, client: Elasticsearch) -> Index {
+    let version = get_index_version(client, &index).await.ok();
+    index.version = version;
+    index
+}
+
+async fn get_index_version(client: Elasticsearch, index: &Index) -> Result<String> {
     let indices_api = client.indices();
 
     let response = indices_api
