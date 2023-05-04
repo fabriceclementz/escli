@@ -1,7 +1,11 @@
+use std::fs::File;
+use std::path::Path;
+
 use anyhow::{Context, Result};
 use clap::Parser;
 use colored::Colorize;
 use elasticsearch::indices::IndicesCreateParts;
+use serde_json::json;
 
 use crate::application::Application;
 use crate::utils::handle_response::handle_response;
@@ -11,10 +15,12 @@ use crate::utils::output::Output;
 pub struct Arguments {
     /// Name of the index to create
     name: String,
+    /// Path to a mapping definition in JSON format
+    #[arg(short, long)]
+    mapping: Option<String>,
     /// Output format
     #[arg(short, long, value_enum, default_value_t = Output::Default)]
     output: Output,
-
     /// Pretty print JSON output
     #[arg(short, long, default_value_t = false)]
     pretty: bool,
@@ -26,7 +32,21 @@ pub async fn handle_command(args: &Arguments, application: &Application) -> Resu
     let indices = client.indices();
     let create = indices.create(IndicesCreateParts::Index(index_name));
 
+    let mut body = json!({});
+    if let Some(mapping_path) = &args.mapping {
+        let file = File::open(Path::new(&mapping_path)).context(format!(
+            "Cannot open mapping definition file at {}",
+            mapping_path
+        ))?;
+
+        let mapping: serde_json::Value =
+            serde_json::from_reader(file).context("Malformated mapping definition")?;
+
+        body["mappings"] = mapping;
+    }
+
     let response = create
+        .body(body)
         .send()
         .await
         .context(format!("Request error for creating index {}", index_name))?;
