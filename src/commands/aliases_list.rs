@@ -1,8 +1,10 @@
 use anyhow::{Context, Result};
 use clap::Parser;
+use colored::Colorize;
 use elasticsearch::cat::CatAliasesParts;
 use serde::{Deserialize, Serialize};
-use tabled::settings::{Panel, Style};
+use tabled::settings::object::Rows;
+use tabled::settings::{Format, Modify, Panel, Style};
 use tabled::{Table, Tabled};
 
 use crate::application::Application;
@@ -55,8 +57,14 @@ pub async fn handle_command(args: &Arguments, application: &Application) -> Resu
 
     match args.output {
         Output::Default => {
+            let header_format = Format::content(|s| s.bold().to_string());
+
             let mut table = Table::new(aliases);
-            table.with(Style::modern()).with(Panel::header("Indices"));
+            table
+                .with(Style::modern())
+                .with(Panel::header("Aliases".bold().to_string()))
+                .with(Modify::new(Rows::single(1)).with(header_format));
+
             println!("{table}");
         }
         Output::Json => output_json(&aliases, args.pretty)?,

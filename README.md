@@ -51,9 +51,9 @@ escli -c ./my-config.yaml
 ### Aliases
 
 - [x] List
-- [ ] Add
-- [ ] Remove
-- [ ] Update
+- [x] Add
+- [x] Remove
+- [x] Update
 
 ### Mappings
 
@@ -62,7 +62,7 @@ escli -c ./my-config.yaml
 
 ## Index settings
 
-- [ ] Get
+- [x] Get
 - [ ] Update
 
 ### Indices
