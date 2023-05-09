@@ -8,6 +8,7 @@ use super::indices_create;
 use super::indices_delete;
 use super::indices_list;
 use super::indices_open;
+use super::indices_settings;
 
 #[derive(Debug, Parser)]
 pub struct Arguments {
@@ -27,6 +28,8 @@ enum Commands {
     Open(indices_open::Arguments),
     /// Closes an index
     Close(indices_close::Arguments),
+    /// Interacts with index settings
+    Settings(indices_settings::Arguments),
 }
 
 pub async fn handle_command(args: &Arguments, application: &Application) -> Result<()> {
@@ -36,5 +39,6 @@ pub async fn handle_command(args: &Arguments, application: &Application) -> Resu
         Commands::Open(args) => indices_open::handle_command(args, application).await,
         Commands::Close(args) => indices_close::handle_command(args, application).await,
         Commands::Delete(args) => indices_delete::handle_command(args, application).await,
+        Commands::Settings(args) => indices_settings::handle_command(args, application).await,
     }
 }

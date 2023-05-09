@@ -10,4 +10,6 @@ mod indices_create;
 mod indices_delete;
 mod indices_list;
 mod indices_open;
+mod indices_settings;
+mod indices_settings_get;
 mod mappings_get;

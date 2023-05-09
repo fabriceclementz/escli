@@ -136,13 +136,14 @@ async fn get_index_version(client: Elasticsearch, index: &Index) -> Result<Strin
 
     let response_body: Value = response.json().await?;
 
+    let fallback_value = Value::String("-".to_string());
     let index_version = response_body
         .get(&index.name)
         .unwrap()
         .get("settings")
         .unwrap()
         .get("index.version.created")
-        .unwrap();
+        .unwrap_or(&fallback_value);
 
     Ok(index_version.to_string())
 }
