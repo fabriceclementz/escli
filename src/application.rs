@@ -2,6 +2,7 @@ use crate::commands::{aliases, indices, mappings, reindex};
 use crate::commands_enum;
 use crate::config::Cluster;
 use crate::config::Config;
+use crate::ui_app::UiApp;
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use elasticsearch::{http::transport::Transport, Elasticsearch};
@@ -10,7 +11,7 @@ use elasticsearch::{http::transport::Transport, Elasticsearch};
 #[clap(author, about, version, propagate_version = true)]
 pub struct ApplicationArguments {
     #[command(subcommand)]
-    sub_command: Commands,
+    sub_command: Option<Commands>,
 
     /// Cluster to connect
     cluster: String,
@@ -22,6 +23,10 @@ pub struct ApplicationArguments {
     /// Make the operation more talkative
     #[arg(short, long, default_value_t = false, global = true)]
     verbose: bool,
+
+    /// Start escli as an interactive terminal application
+    #[arg(long, default_value_t = false)]
+    ui: bool,
 }
 
 // Generates the commands based on the modules in the commands directory
@@ -41,11 +46,15 @@ impl Application {
     }
 
     pub async fn run(&self) -> Result<()> {
-        Commands::run(self).await?;
-
-        // match &self.args.sub_command {
-        //     Commands::Indices(args) => indices::handle_command(args, self).await?,
-        // }
+        if self.args.ui {
+            let mut ui_app = UiApp::new();
+            ui_app.run()?;
+        } else {
+            Commands::run(self).await?;
+            // match &self.args.sub_command {
+            //     Commands::Indices(args) => indices::handle_command(args, self).await?,
+            // }
+        }
 
         Ok(())
     }

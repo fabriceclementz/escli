@@ -12,10 +12,12 @@ macro_rules! commands_enum {
 
             impl Commands {
                 async fn run(application: &Application) -> Result<()> {
-                    match &application.args.sub_command {
-                        $(
-                            Commands::[<$module:camel>](args) => $module::handle_command(args, &application).await?,
-                        )*
+                    if let Some(sub_command) = &application.args.sub_command {
+                        match &sub_command {
+                            $(
+                                Commands::[<$module:camel>](args) => $module::handle_command(args, &application).await?,
+                            )*
+                        }
                     }
 
                     Ok(())

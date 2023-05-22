@@ -6,6 +6,7 @@ use std::process;
 mod application;
 mod commands;
 mod config;
+mod ui_app;
 mod utils;
 
 #[macro_use]

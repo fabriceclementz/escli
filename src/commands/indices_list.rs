@@ -1,10 +1,11 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use clap::Parser;
 use colored::Colorize;
 use elasticsearch::cat::CatIndicesParts;
 use elasticsearch::indices::IndicesGetSettingsParts;
 use elasticsearch::Elasticsearch;
 use futures::{stream, StreamExt};
+use log::debug;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tabled::settings::object::Rows;
@@ -137,13 +138,18 @@ async fn get_index_version(client: Elasticsearch, index: &Index) -> Result<Strin
     let response_body: Value = response.json().await?;
 
     let fallback_value = Value::String("-".to_string());
-    let index_version = response_body
-        .get(&index.name)
-        .unwrap()
-        .get("settings")
-        .unwrap()
-        .get("index.version.created")
-        .unwrap_or(&fallback_value);
+
+    let index_version = match response_body.get(&index.name) {
+        Some(index_json) => index_json
+            .get("settings")
+            .unwrap()
+            .get("index.version.created")
+            .unwrap_or(&fallback_value),
+        None => {
+            debug!("response_body: {}", response_body);
+            bail!("Cannot retrieve index informations for {}", index.name);
+        }
+    };
 
     Ok(index_version.to_string())
 }
